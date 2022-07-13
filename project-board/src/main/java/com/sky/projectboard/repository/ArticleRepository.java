@@ -1,9 +1,10 @@
 package com.sky.projectboard.repository;
 
-import com.querydsl.core.types.dsl.DateTimeExpression;
-import com.querydsl.core.types.dsl.StringExpression;
 import com.sky.projectboard.domain.Article;
 import com.sky.projectboard.domain.QArticle;
+import com.sky.projectboard.repository.querydsl.ArticleRepositoryCustom;
+import com.querydsl.core.types.dsl.DateTimeExpression;
+import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface ArticleRepository extends
         JpaRepository<Article, Long>,
+        ArticleRepositoryCustom,
         QuerydslPredicateExecutor<Article>,
         QuerydslBinderCustomizer<QArticle> {
 
@@ -28,10 +30,11 @@ public interface ArticleRepository extends
     default void customize(QuerydslBindings bindings, QArticle root) {
         bindings.excludeUnlistedProperties(true);
         bindings.including(root.title, root.content, root.hashtag, root.createdAt, root.createdBy);
-        bindings.bind(root.title).first(StringExpression::containsIgnoreCase);  //like '%${v}%'
-        bindings.bind(root.content).first(StringExpression::containsIgnoreCase);  //like '%${v}%'
-        bindings.bind(root.hashtag).first(StringExpression::containsIgnoreCase);  //like '%${v}%'
-        bindings.bind(root.createdAt).first(DateTimeExpression::eq);  //like '%${v}%'
-        bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);  //like '%${v}%'
+        bindings.bind(root.title).first(StringExpression::containsIgnoreCase);
+        bindings.bind(root.content).first(StringExpression::containsIgnoreCase);
+        bindings.bind(root.hashtag).first(StringExpression::containsIgnoreCase);
+        bindings.bind(root.createdAt).first(DateTimeExpression::eq);
+        bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase);
     }
+
 }
