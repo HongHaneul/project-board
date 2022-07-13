@@ -2,6 +2,7 @@ package com.sky.projectboard.repository;
 
 import com.sky.projectboard.config.JpaConfig;
 import com.sky.projectboard.domain.Article;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +27,17 @@ class JpaRepositoryTest {
         this.articleCommentRepository = articleCommentRepository;
     }
 
-    @DisplayName("insert 테스트")
-    @Test
-    void givenTestData_whenInserting_thenWorksFine() {
-        // Given
-        long previousCount = articleRepository.count();
-        // When
-        Article savedArticle = articleRepository.save(Article.of("new article","new content", "#spring"));
-        // Then
-
-        assertThat(articleRepository.count()).isEqualTo(previousCount+1);
-    }
+//    @DisplayName("insert 테스트")
+//    @Test
+//    void givenTestData_whenInserting_thenWorksFine() {
+//        // Given
+//        long previousCount = articleRepository.count();
+//        // When
+//        Article savedArticle = articleRepository.save(Article.of("new article","new content", "#spring"));
+//        // Then
+//
+//        assertThat(articleRepository.count()).isEqualTo(previousCount+1);
+//    }
 
     @DisplayName("update 테스트")
     @Test
