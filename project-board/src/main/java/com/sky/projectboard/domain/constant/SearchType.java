@@ -1,4 +1,4 @@
-package com.sky.projectboard.domain.type;
+package com.sky.projectboard.domain.constant;
 
 import lombok.Getter;
 
