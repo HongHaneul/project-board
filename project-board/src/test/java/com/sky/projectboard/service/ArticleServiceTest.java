@@ -18,10 +18,11 @@ import org.springframework.data.domain.Pageable;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.*;
 
@@ -65,6 +66,36 @@ class ArticleServiceTest {
         then(articleRepository).should().findByTitleContaining(searchKeyword, pageable);
     }
 
+    @DisplayName("검색어 없이 게시글을 해시태그 검색하면, 빈 페이지를 반환한다.")
+    @Test
+    void givenNoSearchParameters_whenSearchingArticlesViaHashtag_thenReturnsEmptyPage() {
+        // Given
+        Pageable pageable = Pageable.ofSize(20);
+
+        // When
+        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(null, pageable);
+
+        // Then
+        assertThat(articles).isEqualTo(Page.empty(pageable));
+        then(articleRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("게시글을 해시태그 검색하면, 게시글 페이지를 반환한다.")
+    @Test
+    void givenHashtag_whenSearchingArticlesViaHashtag_thenReturnsArticlesPage() {
+        // Given
+        String hashtag = "#java";
+        Pageable pageable = Pageable.ofSize(20);
+        given(articleRepository.findByHashtag(hashtag, pageable)).willReturn(Page.empty(pageable));
+
+        // When
+        Page<ArticleDto> articles = sut.searchArticlesViaHashtag(hashtag, pageable);
+
+        // Then
+        assertThat(articles).isEqualTo(Page.empty(pageable));
+        then(articleRepository).should().findByHashtag(hashtag, pageable);
+    }
+
     @DisplayName("게시글을 조회하면, 게시글을 반환한다.")
     @Test
     void givenArticleId_whenSearchingArticle_thenReturnsArticle() {
@@ -91,11 +122,10 @@ class ArticleServiceTest {
         Long articleId = 0L;
         given(articleRepository.findById(articleId)).willReturn(Optional.empty());
 
-        //When
+        // When
         Throwable t = catchThrowable(() -> sut.getArticle(articleId));
 
-        //Then
-
+        // Then
         assertThat(t)
                 .isInstanceOf(EntityNotFoundException.class)
                 .hasMessage("게시글이 없습니다 - articleId: " + articleId);
@@ -108,6 +138,7 @@ class ArticleServiceTest {
         // Given
         ArticleDto dto = createArticleDto();
         given(articleRepository.save(any(Article.class))).willReturn(createArticle());
+
         // When
         sut.saveArticle(dto);
 
@@ -122,6 +153,7 @@ class ArticleServiceTest {
         Article article = createArticle();
         ArticleDto dto = createArticleDto("새 타이틀", "새 내용", "#springboot");
         given(articleRepository.getReferenceById(dto.id())).willReturn(article);
+
         // When
         sut.updateArticle(dto);
 
@@ -144,7 +176,8 @@ class ArticleServiceTest {
         sut.updateArticle(dto);
 
         // Then
-        then(articleRepository).should().getReferenceById(dto.id());    }
+        then(articleRepository).should().getReferenceById(dto.id());
+    }
 
     @DisplayName("게시글의 ID를 입력하면, 게시글을 삭제한다")
     @Test
@@ -152,6 +185,7 @@ class ArticleServiceTest {
         // Given
         Long articleId = 1L;
         willDoNothing().given(articleRepository).deleteById(articleId);
+
         // When
         sut.deleteArticle(1L);
 
@@ -174,12 +208,28 @@ class ArticleServiceTest {
         then(articleRepository).should().count();
     }
 
+    @DisplayName("해시태그를 조회하면, 유니크 해시태그 리스트를 반환한다")
+    @Test
+    void givenNothing_whenCalling_thenReturnsHashtags() {
+        // Given
+        List<String> expectedHashtags = List.of("#java", "#spring", "#boot");
+        given(articleRepository.findAllDistinctHashtags()).willReturn(expectedHashtags);
+
+        // When
+        List<String> actualHashtags = sut.getHashtags();
+
+        // Then
+        assertThat(actualHashtags).isEqualTo(expectedHashtags);
+        then(articleRepository).should().findAllDistinctHashtags();
+    }
+
+
     private UserAccount createUserAccount() {
         return UserAccount.of(
-                "sky",
+                "uno",
                 "password",
-                "sky@email.com",
-                "sky",
+                "uno@email.com",
+                "Uno",
                 null
         );
     }
@@ -204,23 +254,24 @@ class ArticleServiceTest {
                 content,
                 hashtag,
                 LocalDateTime.now(),
-                "sky",
+                "Uno",
                 LocalDateTime.now(),
-                "sky");
+                "Uno");
     }
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
                 1L,
-                "sky",
+                "uno",
                 "password",
-                "sky@mail.com",
-                "sky",
+                "uno@mail.com",
+                "Uno",
                 "This is memo",
                 LocalDateTime.now(),
-                "sky",
+                "uno",
                 LocalDateTime.now(),
-                "sky"
-        );    }
+                "uno"
+        );
+    }
 
 }
