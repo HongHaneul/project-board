@@ -1,5 +1,6 @@
 package com.sky.projectboard.controller;
 
+import com.sky.projectboard.config.TestSecurityConfig;
 import com.sky.projectboard.domain.constant.FormStatus;
 import com.sky.projectboard.domain.constant.SearchType;
 import com.sky.projectboard.dto.ArticleDto;
