@@ -3,7 +3,9 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
-
+test {
+    exclude '**/*'
+}
 group = 'com.sky'
 version = 'v1.1'
 sourceCompatibility = '17'
